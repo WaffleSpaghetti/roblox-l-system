@@ -6,6 +6,7 @@ Turtle.meta = {}
 
 Turtle.meta.__index = Turtle.proto
 
+local original = {}
 function Turtle.new(obj)
 	obj = obj or {}
 	obj.stack = obj.stack or {}
@@ -18,6 +19,19 @@ function Turtle.new(obj)
 	end
 	obj.rules = merged
 	setmetatable(obj, Turtle.meta)
+	
+	original = {
+		pos = obj.pos,
+		dir = obj.dir,
+		speed = obj.speed,
+		transparency = obj.transparency,
+		color = obj.color,
+		pendown = obj.pendown,
+		turnAngle = obj.turnAngle,
+		lineWidth = obj.lineWidth,
+		canCollide = obj.canCollide,
+		castShadow = obj.castShadow,
+	}
 	return obj
 end
 
@@ -37,9 +51,9 @@ Turtle.proto.lineWidth = 0.1
 Turtle.proto.material = Enum.Material.SmoothPlastic
 Turtle.proto.transparency = 0
 Turtle.proto.pendown = false
+
 Turtle.proto.rules = {
 	["["] = function(self)
-		local c = self.color
 		table.insert(self.stack, {
 			pos = self.pos,
 			dir = self.dir,
@@ -139,6 +153,18 @@ function Turtle.proto:build(str)
 			handle(self)
 		end
 	end
+end
+function Turtle.proto:reset()
+	self.pos = original.pos
+	self.dir = original.dir
+	self.speed = original.speed
+	self.transparency = original.transparency
+	self.color = original.color
+	self.pendown = original.pendown
+	self.turnAngle = original.turnAngle
+	self.lineWidth = original.lineWidth
+	self.canCollide = original.canCollide
+	self.castShadow = original.castShadow
 end
 
 return Turtle
