@@ -15,7 +15,7 @@ end
 
 local trees = {}
 trees.plants = {
-	appleTree = LSystem{
+	baseTree = LSystem{
 		axiom = "GF",
 		rules = {
 			F = "G[[XvF]xvF][YvF]yvF",
@@ -61,12 +61,62 @@ trees.turtles = {
 				self:move(0.5)
 			end,
 		},
-	}
+	},
+	cherryTurtle = Turtle{
+		lineWidth = 1.5,
+		speed = 3,
+		rules = {
+			["v"] = function(self)
+				self.lineWidth /= 1.3
+				self.speed /= 1.2
+			end,
+			["F"] = function(self)
+				local colors = {
+					["#FF5CDE"] = 10,
+					["#FF0088"] = 10,
+					["#FF0000"] = 1,
+				}
+				local pickedColor = chooseColor(colors)
+				
+				self:move(0.5)
+				self:buildBranch(
+					CFrame.lookAt(self.cframe.Position, self.cframe.Position + self.cframe.LookVector),
+					Vector3.one*self.lineWidth*2,
+					Color3.fromHex(pickedColor)
+				)
+				self:move(0.5)
+			end,
+			["G"] = function(self)
+				local colors = {
+					["#320A23"] = 1,
+					["#280A19"] = 1,
+				}
+				local pickedColor = chooseColor(colors)
+				
+				self:move(0.5)
+				self:buildBranch(
+					CFrame.lookAt(self.cframe.Position, self.cframe.Position + self.cframe.LookVector),
+					Vector3.new(self.lineWidth,self.lineWidth,self.speed),
+					Color3.fromHex(pickedColor)
+				)
+				self:move(0.5)
+			end,
+		},
+	},
 }
 
 function trees:growApple(pos,dir,steps,container)
-	local plant = self.plants.appleTree
+	local plant = self.plants.baseTree
 	local turtle = self.turtles.appleTurtle
+
+	turtle.container = container
+	turtle:reset()
+	turtle.cframe = CFrame.lookAt(pos,pos+dir.Unit)
+	turtle:build(plant:run(steps,false))
+end
+function trees:growCherry(pos,dir,steps,container)
+	local plant = self.plants.baseTree
+	local turtle = self.turtles.cherryTurtle
 
 	turtle.container = container
 	turtle:reset()
