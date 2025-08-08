@@ -9,4 +9,4 @@ for x=-size,size,20 do
 end
 --]]
 
-Trees:growApple(Vector3.new(0,10,-120),Vector3.new(0,1,0),8)
+Trees:growCherry(Vector3.new(0,10,-120),Vector3.new(0,1,0),8)
