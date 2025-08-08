@@ -44,12 +44,27 @@ trees.turtles = {
 				local pickedColor = chooseColor(colors)
 
 				self:move(0.5)
-				self:buildBranch(
+				local part = self:buildBranch(
 					CFrame.lookAt(self.cframe.Position, self.cframe.Position + self.cframe.LookVector),
-					Vector3.one*self.lineWidth*2,
+					Vector3.one*self.lineWidth*4,
 					Color3.fromHex(pickedColor)
 				)
 				self:move(0.5)
+				
+				if pickedColor == "#FF0000" then
+					local proxPrompt = Instance.new("ProximityPrompt")
+					proxPrompt.Enabled = true
+					proxPrompt.ActionText = "Collect"
+					proxPrompt.HoldDuration = 0.5
+					proxPrompt.Parent = part
+					local sound = game.ReplicatedStorage["Pop Sound"]:Clone()
+					sound.Parent = part
+					proxPrompt.Triggered:Connect(function(p)
+						sound:Play()
+						task.wait(1)
+						part:Destroy()
+					end)
+				end
 			end,
 			["G"] = function(self)
 				self:move(0.5)
