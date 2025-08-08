@@ -61,7 +61,7 @@ trees.turtles = {
 					sound.Parent = part
 					proxPrompt.Triggered:Connect(function(p)
 						sound:Play()
-						task.wait(1)
+						task.wait(0.2)
 						part:Destroy()
 					end)
 				end
