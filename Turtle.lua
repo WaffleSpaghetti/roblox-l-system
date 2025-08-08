@@ -21,8 +21,7 @@ function Turtle.new(obj)
 	setmetatable(obj, Turtle.meta)
 
 	original = {
-		pos = obj.pos,
-		dir = obj.dir,
+		cframe = obj.cframe,
 		speed = obj.speed,
 		transparency = obj.transparency,
 		color = obj.color,
@@ -40,16 +39,16 @@ setmetatable(Turtle, {
 })
 
 -- main
+Turtle.proto.cframe = CFrame.lookAt(Vector3.zero, Vector3.new(0,1,0))
+Turtle.proto.speed = 1
+Turtle.proto.turnAngle = math.rad(45)
+
 Turtle.proto.container = workspace
 Turtle.proto.canCollide = false
 Turtle.proto.castShadow = false
-Turtle.proto.pos = Vector3.zero
-Turtle.proto.dir = Vector3.new(0,1,0)
-Turtle.proto.speed = 1
-Turtle.proto.turnAngle = math.rad(45)
-Turtle.proto.lineWidth = 0.1
 Turtle.proto.material = Enum.Material.SmoothPlastic
 Turtle.proto.transparency = 0
+Turtle.proto.lineWidth = 0.1
 Turtle.proto.pendown = false
 
 function Turtle.proto:buildBranch(cframe, size, color)
@@ -66,17 +65,16 @@ function Turtle.proto:buildBranch(cframe, size, color)
 	return part
 end
 function Turtle.proto:move(length)
-	self.pos = self.pos + self.dir.Unit * self.speed * length
+	self.cframe = self.cframe * CFrame.new(0, 0, -length * self.speed)
 end
 function Turtle.proto:turn(axis, angle)
-	self.dir = (CFrame.fromAxisAngle(axis.Unit, angle) * self.dir).Unit
+	self.cframe = self.cframe * CFrame.fromAxisAngle(axis.Unit, angle)
 end
 
 Turtle.proto.rules = {
 	["["] = function(self)
 		table.insert(self.stack, {
-			pos = self.pos,
-			dir = self.dir,
+			cframe = self.cframe,
 			speed = self.speed,
 			transparency = self.transparency,
 			color = self.color,
@@ -89,8 +87,7 @@ Turtle.proto.rules = {
 	end,
 	["]"] = function(self)
 		local pop = table.remove(self.stack)
-		self.pos = pop.pos
-		self.dir = pop.dir
+		self.cframe = pop.cframe
 		self.speed = pop.speed
 		self.transparency = pop.transparency
 		self.color = pop.color
@@ -104,7 +101,7 @@ Turtle.proto.rules = {
 		if self.pendown then
 			self:move(0.5)
 			self:buildBranch(
-				CFrame.lookAt(self.pos, self.pos + self.dir),
+				CFrame.lookAt(self.cframe.Position, self.cframe.Position + self.cframe.LookVector),
 				Vector3.new(self.lineWidth,self.lineWidth,self.speed),
 				self.color
 			)
@@ -117,7 +114,7 @@ Turtle.proto.rules = {
 		if self.pendown then
 			self:move(-0.5)
 			self:buildBranch(
-				CFrame.lookAt(self.pos, self.pos - self.dir),
+				CFrame.lookAt(self.cframe.Position, self.cframe.Position - self.cframe.LookVector),
 				Vector3.new(self.lineWidth,self.lineWidth,self.speed),
 				self.color
 			)
@@ -161,8 +158,7 @@ function Turtle.proto:build(str)
 	end
 end
 function Turtle.proto:reset()
-	self.pos = original.pos
-	self.dir = original.dir
+	self.cframe = original.cframe
 	self.speed = original.speed
 	self.transparency = original.transparency
 	self.color = original.color
