@@ -18,7 +18,7 @@ setmetatable(LSystem, {
 })
 
 -- helpers
-local function choose(rules, letter)
+local function chooseRule(rules, letter)
 	local replacement = rules[letter] or letter
 	if type(replacement) == "table" then
 		local accumulator = 0
@@ -43,7 +43,7 @@ function LSystem.proto:step(updateSelf)
 	local old = self.string
 	local new = {}
 	for letter in string.gmatch(old, ".") do
-		local replacement = choose(self.rules, letter)
+		local replacement = chooseRule(self.rules, letter)
 		table.insert(new, replacement)
 	end
 	local newString = table.concat(new)
