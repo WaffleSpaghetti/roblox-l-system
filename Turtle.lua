@@ -19,7 +19,7 @@ function Turtle.new(obj)
 	end
 	obj.rules = merged
 	setmetatable(obj, Turtle.meta)
-	
+
 	original = {
 		pos = obj.pos,
 		dir = obj.dir,
@@ -52,6 +52,26 @@ Turtle.proto.material = Enum.Material.SmoothPlastic
 Turtle.proto.transparency = 0
 Turtle.proto.pendown = false
 
+function Turtle.proto:buildBranch(cframe, size, color)
+	local part = Instance.new("Part")
+	part.Size = size
+	part.CanCollide=self.canCollide
+	part.CastShadow=self.castShadow
+	part.Material=self.material
+	part.Transparency=self.transparency
+	part.Anchored = true
+	part.Color = color
+	part.CFrame = cframe
+	part.Parent = self.container
+	return part
+end
+function Turtle.proto:move(length)
+	self.pos = self.pos + self.dir.Unit * self.speed * length
+end
+function Turtle.proto:turn(axis, angle)
+	self.dir = (CFrame.fromAxisAngle(axis.Unit, angle) * self.dir).Unit
+end
+
 Turtle.proto.rules = {
 	["["] = function(self)
 		table.insert(self.stack, {
@@ -82,61 +102,47 @@ Turtle.proto.rules = {
 	end,
 	F = function(self)
 		if self.pendown then
-			self.pos = self.pos + self.dir.Unit * self.speed/2
-			
-			local part = Instance.new("Part")
-			part.Size = Vector3.new(self.lineWidth,self.lineWidth,self.speed)
-			part.CanCollide=self.canCollide
-			part.CastShadow=self.castShadow
-			part.Material=self.material
-			part.Transparency=self.transparency
-			part.Anchored = true
-			part.Color = self.color
-			part.CFrame = CFrame.lookAt(self.pos, self.pos + self.dir)
-			part.Parent = self.container
-			
-			self.pos = self.pos + self.dir.Unit * self.speed/2
+			self:move(0.5)
+			self:buildBranch(
+				CFrame.lookAt(self.pos, self.pos + self.dir),
+				Vector3.new(self.lineWidth,self.lineWidth,self.speed),
+				self.color
+			)
+			self:move(0.5)
 		else
-			self.pos = self.pos + self.dir.Unit * self.speed
+			self:move(1)
 		end
 	end,
 	f = function(self)
 		if self.pendown then
-			self.pos = self.pos + self.dir.Unit * self.speed/2 * -1
-
-			local part = Instance.new("Part")
-			part.Size = Vector3.new(self.lineWidth,self.lineWidth,self.speed)
-			part.CanCollide=self.canCollide
-			part.CastShadow=self.castShadow
-			part.Material=self.material
-			part.Transparency=self.transparency
-			part.Anchored = true
-			part.Color = self.color
-			part.CFrame = CFrame.lookAt(self.pos, self.pos - self.dir)
-			part.Parent = self.container
-
-			self.pos = self.pos + self.dir.Unit * self.speed/2 * -1
+			self:move(-0.5)
+			self:buildBranch(
+				CFrame.lookAt(self.pos, self.pos - self.dir),
+				Vector3.new(self.lineWidth,self.lineWidth,self.speed),
+				self.color
+			)
+			self:move(-0.5)
 		else
-			self.pos = self.pos + self.dir.Unit * self.speed * -1
+			self:move(-1)
 		end
 	end,
 	X = function(self)
-		self.dir = (CFrame.fromAxisAngle(Vector3.new(1, 0, 0), self.turnAngle) * self.dir)
+		self:turn(Vector3.new(1,0,0), self.turnAngle)
 	end,
 	x = function(self)
-		self.dir = (CFrame.fromAxisAngle(Vector3.new(1, 0, 0), -self.turnAngle) * self.dir)
+		self:turn(Vector3.new(1,0,0), -self.turnAngle)
 	end,
 	Y = function(self)
-		self.dir = (CFrame.fromAxisAngle(Vector3.new(0, 1, 0), self.turnAngle) * self.dir)
+		self:turn(Vector3.new(0,1,0), self.turnAngle)
 	end,
 	y = function(self)
-		self.dir = (CFrame.fromAxisAngle(Vector3.new(0, 1, 0), -self.turnAngle) * self.dir)
+		self:turn(Vector3.new(0,1,0), -self.turnAngle)
 	end,
 	Z = function(self)
-		self.dir = (CFrame.fromAxisAngle(Vector3.new(0, 0, 1), self.turnAngle) * self.dir)
+		self:turn(Vector3.new(0,0,1), self.turnAngle)
 	end,
 	z = function(self)
-		self.dir = (CFrame.fromAxisAngle(Vector3.new(0, 0, 1), -self.turnAngle) * self.dir)
+		self:turn(Vector3.new(0,0,1), -self.turnAngle)
 	end,
 	P = function(self)
 		self.pendown = true
