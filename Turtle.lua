@@ -44,8 +44,8 @@ Turtle.proto.speed = 1
 Turtle.proto.turnAngle = math.rad(45)
 
 Turtle.proto.container = workspace
-Turtle.proto.canCollide = false
-Turtle.proto.castShadow = false
+Turtle.proto.canCollide = true
+Turtle.proto.castShadow = true
 Turtle.proto.material = Enum.Material.SmoothPlastic
 Turtle.proto.transparency = 0
 Turtle.proto.lineWidth = 0.1
